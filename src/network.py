@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 network.py
 ~~~~~~~~~~
@@ -9,6 +11,7 @@ simple, easily readable, and easily modifiable.  It is not optimized,
 and omits many desirable features.
 """
 
+
 #### Libraries
 # Standard library
 import random
@@ -19,21 +22,16 @@ import numpy as np
 class Network(object):
 
     def __init__(self, sizes):
-        """The list ``sizes`` contains the number of neurons in the
-        respective layers of the network.  For example, if the list
-        was [2, 3, 1] then it would be a three-layer network, with the
-        first layer containing 2 neurons, the second layer 3 neurons,
-        and the third layer 1 neuron.  The biases and weights for the
-        network are initialized randomly, using a Gaussian
-        distribution with mean 0, and variance 1.  Note that the first
-        layer is assumed to be an input layer, and by convention we
-        won't set any biases for those neurons, since biases are only
-        ever used in computing the outputs from later layers."""
+        """在这段代码中,列表 sizes 包含各层神经元的数量。
+        例如,如果我们想创建一个在第一层有 2 个神经元,第二层有 3 个神经元,最后层有 1 个神经元的 Network 对象,我们应这样写代码:
+　　　　　net = Network([2, 3, 1])
+　　　　　Network 对象中的偏置和权重都是被随机初始化的,使用 Numpy 的 np.random.randn 函数来生成均值为 0,标准差为 1 的高斯分布。
+　　　　　这样的随机初始化给了我们的随机梯度下降算法一个起点。在后面的章节中我们将会发现更好的初始化权重和偏置的方法,但是目前随机地将其初始化。
+        注意 Network 初始化代码假设第一层神经元是一个输入层,并对这些神经元不设置任何偏置,因为偏置仅在后面的层中用于计算输出。"""
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x)
-                        for x, y in zip(sizes[:-1], sizes[1:])]
+        self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
 
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
@@ -41,6 +39,11 @@ class Network(object):
             a = sigmoid(np.dot(w, a)+b)
         return a
 
+    '''training_data是一个 (x, y)元组的列表,表示训练输入和其对应的期望输出。
+       epochs 迭代期数量
+       mini_batch_size 采样时的小批量数据的大小
+       eta 是学习速率,η。
+       test_data 如果给出了此可选参数,那么程序会在每个训练器后评估网络,并打印出部分进展。这对于追踪进度很有用,但相当拖慢执行速度。'''
     def SGD(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
@@ -66,6 +69,10 @@ class Network(object):
             else:
                 print "Epoch {0} complete".format(j)
 
+    '''代码如下工作。在每个迭代期,它首先随机地将训练数据打乱,然后将它分成多个适当大小的小批量数据。
+      这是一个简单的从训练数据的随机采样方法。然后对于每一个 mini_batch 我们应用一次梯度下降。
+      这是通过代码 self.update_mini_batch(mini_batch,eta)完成的,它仅仅使用 mini_batch 中的训练数据,
+      根据单次梯度下降的迭代更新网络的权重和偏置。'''
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
@@ -74,7 +81,11 @@ class Network(object):
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
-            delta_nabla_b, delta_nabla_w = self.backprop(x, y)
+            #大部分工作由这行代码完成，这行代码调用了一个称为反向传播的算法，一种快速计算代价函数的梯度的方法
+            #因此 update_mini_batch 的工作仅仅是对 mini_batch 中的每一个训练样本计算梯度，
+            #然后适当地更新 self.weights 和 self.biases
+            delta_nabla_b, delta_nabla_w = self.backprop(x, y) 
+
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         self.weights = [w-(eta/len(mini_batch))*nw
