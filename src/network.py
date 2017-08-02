@@ -57,15 +57,17 @@ class Network(object):
         if test_data: n_test = len(test_data)
         n = len(training_data)
         for j in xrange(epochs):
+            #将training_data随机排序
             random.shuffle(training_data)
-            mini_batches = [
-                training_data[k:k+mini_batch_size]
-                for k in xrange(0, n, mini_batch_size)]
+
+            #将 training_data 按照 mini_batch_size 大小分割为多份
+            mini_batches = [training_data[k:k+mini_batch_size] for k in xrange(0, n, mini_batch_size)]
+
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
+                
             if test_data:
-                print "Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test)
+                print "Epoch {0}: {1} / {2}".format(j, self.evaluate(test_data), n_test)
             else:
                 print "Epoch {0} complete".format(j)
 
@@ -133,8 +135,7 @@ class Network(object):
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        test_results = [(np.argmax(self.feedforward(x)), y)
-                        for (x, y) in test_data]
+        test_results = [(np.argmax(self.feedforward(x)), y) for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
     def cost_derivative(self, output_activations, y):
