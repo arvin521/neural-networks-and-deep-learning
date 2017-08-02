@@ -65,13 +65,13 @@ class Network(object):
 
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
-                
+
             if test_data:
                 print "Epoch {0}: {1} / {2}".format(j, self.evaluate(test_data), n_test)
             else:
                 print "Epoch {0} complete".format(j)
 
-    '''代码如下工作。在每个迭代期,它首先随机地将训练数据打乱,然后将它分成多个适当大小的小批量数据。
+    '''在每个迭代期,它首先随机地将训练数据打乱,然后将它分成多个适当大小的小批量数据。
       这是一个简单的从训练数据的随机采样方法。然后对于每一个 mini_batch 我们应用一次梯度下降。
       这是通过代码 self.update_mini_batch(mini_batch,eta)完成的,它仅仅使用 mini_batch 中的训练数据,
       根据单次梯度下降的迭代更新网络的权重和偏置。'''
@@ -90,11 +90,14 @@ class Network(object):
 
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [w-(eta/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, nabla_b)]
+        self.weights = [w-(eta/len(mini_batch))*nw for w, nw in zip(self.weights, nabla_w)]
+        self.biases = [b-(eta/len(mini_batch))*nb for b, nb in zip(self.biases, nabla_b)]
 
+    '''所有的繁重工作由 self.SGD 和 self.update_mini_batch 完成。
+    self.backprop 方法利用一些额外的函数来帮助计算梯度,即 sigmoid_prime,它计算 σ　函数的导数,
+    以及 self.cost_derivative,这里我不会对它过多描述。你能够通过查看代码或文档注释来获得这些的要点(或者细节)。
+    我们将在下章详细地看它们。注意,虽然程序显得很⻓,但是很多代码是用来使代码更容易理解的文档注释。
+    实际上,程序只包含 74 行非空、非注释的代码。'''
     def backprop(self, x, y):
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
         gradient for the cost function C_x.  ``nabla_b`` and
