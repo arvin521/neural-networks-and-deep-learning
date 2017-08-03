@@ -44,16 +44,7 @@ class Network(object):
        mini_batch_size 采样时的小批量数据的大小
        eta 是学习速率,η。
        test_data 如果给出了此可选参数,那么程序会在每个训练器后评估网络,并打印出部分进展。这对于追踪进度很有用,但相当拖慢执行速度。'''
-    def SGD(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None):
-        """Train the neural network using mini-batch stochastic
-        gradient descent.  The ``training_data`` is a list of tuples
-        ``(x, y)`` representing the training inputs and the desired
-        outputs.  The other non-optional parameters are
-        self-explanatory.  If ``test_data`` is provided then the
-        network will be evaluated against the test data after each
-        epoch, and partial progress printed out.  This is useful for
-        tracking progress, but slows things down substantially."""
+    def SGD(self, training_data, epochs, mini_batch_size, eta, test_data=None):    
         if test_data: n_test = len(test_data)
         n = len(training_data)
         for j in xrange(epochs):
@@ -115,8 +106,7 @@ class Network(object):
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
+        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # Note that the variable l in the loop below is used a little
