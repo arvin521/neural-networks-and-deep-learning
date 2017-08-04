@@ -47,6 +47,7 @@ class Network(object):
     def SGD(self, training_data, epochs, mini_batch_size, eta, test_data=None):    
         if test_data: n_test = len(test_data)
         n = len(training_data)
+        best_fit_num = 0
         for j in xrange(epochs):
             #将training_data随机排序
             random.shuffle(training_data)
@@ -60,8 +61,16 @@ class Network(object):
             if test_data:
                 fit_num = self.evaluate(test_data)
                 print "Epoch {0}: {1} / {2}".format(j, fit_num, n_test)
+
+                #将训练后的模型参数保存下来                
+                if fit_num > best_fit_num :
+                    print "Save param ..."
+                    best_fit_num = fit_num
+                    save_params(self.weights, self.biases)
             else:
                 print "Epoch {0} complete".format(j)
+            
+            print
 
     '''在每个迭代期,它首先随机地将训练数据打乱,然后将它分成多个适当大小的小批量数据。
       这是一个简单的从训练数据的随机采样方法。然后对于每一个 mini_batch 我们应用一次梯度下降。
@@ -145,3 +154,10 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
+
+def save_params(weights, biases):
+    import cPickle
+    write_file = open('params', 'wb')   
+    cPickle.dump(weights, write_file, -1)  
+    cPickle.dump(biases, write_file, -1)  
+    write_file.close()  
