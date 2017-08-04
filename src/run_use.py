@@ -26,8 +26,8 @@ if __name__ == "__main__":
         weights = cPickle.load(f)        
         biases = cPickle.load(f)
 
-        test_results = [(np.argmax(feedforward(weights, biases, x)), y) for (x, y) in test_data]
+        test_results = [(np.argmax(feedforward(weights, biases, x)), y) for (x, y) in validation_data]
         fit_num = sum(int(x == y) for (x, y) in test_results)
-        print "{0} / {1}".format(fit_num, len(test_data))
+        print "{0} / {1}".format(fit_num, len(validation_data))
     else:
         print "There is no param file!"
